@@ -5,6 +5,7 @@ var Airtable = require('airtable');
 var base = new Airtable({ apiKey: 'patuuwMwGmAjND2nB.283a8c42b2e50f0ec514e62b0f6849710fac6ab3261d3eb60f86ce2850db5faa' }).base('appgcV0MxZ8v0LEL7');
 
 
+
 router.get('/wishlist/:userId', (req, res) => {
     var wishlist = []
 
@@ -22,7 +23,6 @@ router.get('/wishlist/:userId', (req, res) => {
             const jsonData = JSON.parse(jsonFieldValue); // Parse the JSON string
             wishlist.push(jsonData)
         });
-
         // To fetch the next page of records, call `fetchNextPage`.
         // If there are more records, `page` will get called again.
         // If there are no more records, `done` will get called.
@@ -30,6 +30,11 @@ router.get('/wishlist/:userId', (req, res) => {
 
     }, function done(err) {
         if (err) { console.error(err); return; }
+        res.setHeader('Access-Control-Allow-Origin', '*');
+        res.setHeader('Access-Control-Allow-Headers', '*');
+        res.setHeader('Access-Control-Allow-Methods', '*');
+        
+        console.log(res)
         res.json(wishlist)
     });
 });

@@ -1,9 +1,13 @@
 const express = require('express');
 const app = express();
+const cors = require('cors');
+
 
 // Import controllers
 const elbController = require('./controllers/elb');
 const wishlistController = require('./controllers/v1/wishlist');
+
+app.use(cors());
 
 // Use controllers for specific routes
 app.use('/', elbController);
