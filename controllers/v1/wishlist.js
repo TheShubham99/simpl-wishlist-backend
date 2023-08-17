@@ -29,7 +29,7 @@ router.get('/wishlist/:userId', (req, res) => {
                 variant_id: jsonData.variants[0].id,
                 initial_price: 10000,
                 images: [
-                    "xyz.jpg",
+                    jsonData.images[0].src,
                 ],
                 vendor: jsonData.vendor,
                 current_price: jsonData.variants[0].price,
