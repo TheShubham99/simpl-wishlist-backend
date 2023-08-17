@@ -25,17 +25,17 @@ router.get('/wishlist/:userId', (req, res) => {
 
             const response = {
                 id: jsonData.id,
-                product_name: jsonData.product_name,
-                variant_id: jsonData.variant_id,
+                product_name: jsonData.title,
+                variant_id: jsonData.variants[0].id,
                 initial_price: 10000,
                 images: [
                     "xyz.jpg",
                 ],
                 vendor: jsonData.vendor,
-                current_price: jsonData.current_price,
+                current_price: jsonData.variants[0].price,
                 is_in_stock: true,
             }
-            console.log(response)
+
             wishlist.push(response)
         });
         // To fetch the next page of records, call `fetchNextPage`.
