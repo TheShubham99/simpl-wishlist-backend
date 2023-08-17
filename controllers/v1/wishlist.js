@@ -1,22 +1,47 @@
 // wishlist.js
 const express = require('express');
 const router = express.Router();
+var Airtable = require('airtable');
+var base = new Airtable({ apiKey: 'patuuwMwGmAjND2nB.283a8c42b2e50f0ec514e62b0f6849710fac6ab3261d3eb60f86ce2850db5faa' }).base('appgcV0MxZ8v0LEL7');
 
-// Define user-related routes and handlers
+
 router.get('/wishlist/:userId', (req, res) => {
-    const wishlist = [
-        {
-            "product_name": "Washing machine",
-            "thumbnails": [
-                "https://i.ytimg.com/vi/xPITpF1YNQ0/maxresdefault.jpg",
-                "https://www.shutterstock.com/shutterstock/photos/2199731701/display_1500/stock-photo-young-handsome-man-putting-dirty-laundry-into-washing-machine-winking-looking-at-the-camera-with-2199731701.jpg"
-            ],
-            "price_in_paise": 2000000
-        }
-    ]
+    var wishlist = []
 
-    res.json(wishlist)
+    const userId = req.params.userId;
+    base('Wishlists').select({
+        // Selecting the first 3 records in Grid view:
+        maxRecords: 3,
+        filterByFormula: `user_id = "${userId}"`,
+        view: "Grid view"
+    }).eachPage(function page(records, fetchNextPage) {
+        // This function (`page`) will get called for each page of records.
+        wishlist = []
+        records.forEach(function (record) {
+            const jsonFieldValue = record.get('product_details'); // JSON data as string
+            const jsonData = JSON.parse(jsonFieldValue); // Parse the JSON string
+            wishlist.push(jsonData)
+        });
+
+        // To fetch the next page of records, call `fetchNextPage`.
+        // If there are more records, `page` will get called again.
+        // If there are no more records, `done` will get called.
+        fetchNextPage();
+
+    }, function done(err) {
+        if (err) { console.error(err); return; }
+        res.json(wishlist)
+    });
 });
 
 // Export the router
 module.exports = router;
+
+// const buyNow = () =>{
+//     if(document.location.href.includes("wishlist=true")){
+//         const button = document.getElementById('simpl_buynow-button');
+
+// // Simulate a button click
+// button.click();
+//     }
+// }
