@@ -11,8 +11,6 @@ router.get('/wishlist/:userId', (req, res) => {
 
     const userId = req.params.userId;
     base('Wishlists').select({
-        // Selecting the first 3 records in Grid view:
-        maxRecords: 3,
         filterByFormula: `user_id = "${userId}"`,
         view: "Grid view"
     }).eachPage(function page(records, fetchNextPage) {
@@ -22,7 +20,7 @@ router.get('/wishlist/:userId', (req, res) => {
             const jsonFieldValue = record.get('product_details'); // JSON data as string
             const jsonData = JSON.parse(jsonFieldValue); // Parse the JSON string
 
-            console.log(jsonData)
+            console.log(record.get('product_url'))
 
             const response = {
                 id: jsonData.id,
@@ -32,6 +30,7 @@ router.get('/wishlist/:userId', (req, res) => {
                 images: [
                     jsonData.images[0].src,
                 ],
+                product_url: record.get('product_url'),
                 vendor: jsonData.vendor,
                 current_price: jsonData.variants[0].price,
                 is_in_stock: true,
@@ -63,6 +62,7 @@ router.post('/wishlist/:userId', (req, res) => {
         user_id: userId,
         product_id: product.id,
         product_name: product.title,
+        product_url: productURL,
         variant_id: product.variants[0].id,
         initial_price: parseInt(product.variants[0].price * 100),
         product_details: JSON.stringify(product)
