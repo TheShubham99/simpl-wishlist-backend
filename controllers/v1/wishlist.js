@@ -2,6 +2,7 @@
 const express = require('express');
 const router = express.Router();
 var Airtable = require('airtable');
+const axios = require('axios');
 var base = new Airtable({ apiKey: 'patuuwMwGmAjND2nB.283a8c42b2e50f0ec514e62b0f6849710fac6ab3261d3eb60f86ce2850db5faa' }).base('appgcV0MxZ8v0LEL7');
 
 
@@ -56,7 +57,7 @@ router.get('/wishlist/:userId', (req, res) => {
 router.post('/wishlist/:userId', (req, res) => {
     const userId = req.params.userId;
     const product = req.body.product
-    var redirection_url = ""
+    const productURL = req.body.product_url
 
     const createPayload = {
         user_id: userId,
@@ -72,6 +73,7 @@ router.post('/wishlist/:userId', (req, res) => {
             "fields": createPayload
         }
     ], function (err, records) {
+
         if (err) {
             console.error(err);
             return;
@@ -79,13 +81,55 @@ router.post('/wishlist/:userId', (req, res) => {
         records.forEach(function (record) {
             const wishListId = record.getId()
             redirection_url = "https://checkout.stagingsimpl.com/wishlist/" + wishListId
-            res.json({ success: true, redirection_url: redirection_url })
+
+            initiateCart(wishListId, productURL, product).then((response) => {
+                const redirection_url = response.data.redirection_url + "&addToWishlist=true"
+                res.json({
+                    success: true,
+                    redirection_url: redirection_url
+                })
+
+            }).catch((error) => {
+                console.log(error);
+            });
+
         });
     });
 })
 // Export the router
 module.exports = router;
 
+const initiateCart = (wishListId, productURL, product) => {
+    let cartPayload = JSON.stringify({
+        "source": "pdp",
+        "unique_id": wishListId,
+        "selected_variant": {
+            "variant_id": product.variants[0].id,
+            "quantity": 1,
+            "product_url": productURL
+        },
+        "product": product
+    });
+
+    const urlObject = new URL(productURL);
+
+    // Extract the base URL (protocol and domain)
+    const shopDomain = urlObject.hostname;
+
+    let config = {
+        method: 'post',
+        maxBodyLength: Infinity,
+        url: 'https://pi3-backend.stagingsimpl.com/api/v2/cart/initiate',
+        headers: {
+            'content-type': 'application/json',
+            'shopify-shop-domain': shopDomain,
+        },
+        data: cartPayload
+    };
+
+    return axios.request(config)
+
+}
 // const buyNow = () =>{
 //     if(document.location.href.includes("wishlist=true")){
 //         const button = document.getElementById('simpl_buynow-button');
