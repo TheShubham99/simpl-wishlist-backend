@@ -20,10 +20,9 @@ router.get('/wishlist/:userId', (req, res) => {
             const jsonFieldValue = record.get('product_details'); // JSON data as string
             const jsonData = JSON.parse(jsonFieldValue); // Parse the JSON string
 
-            console.log(record.get('product_url'))
-
             const response = {
-                id: jsonData.id,
+                id: record.get('id'),
+                product_id: jsonData.id,
                 product_name: jsonData.title,
                 variant_id: jsonData.variants[0].id,
                 initial_price: 10000,
