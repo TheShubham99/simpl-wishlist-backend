@@ -32,7 +32,7 @@ router.get('/wishlist/:userId', (req, res) => {
                 product_url: record.get('product_url'),
                 vendor: jsonData.vendor,
                 current_price: parseInt(jsonData.variants[0].price * 100),
-                is_in_stock: true,
+                is_in_stock: record.get('is_in_stock') || false,
             }
 
             wishlist.push(response)
