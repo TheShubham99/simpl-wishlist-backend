@@ -7,6 +7,9 @@ var base = new Airtable({ apiKey: 'patuuwMwGmAjND2nB.283a8c42b2e50f0ec514e62b0f6
 
 
 router.get('/wishlist/:userId', (req, res) => {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Headers', "Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization, accept, origin, Cache-Control, X-Requested-With");
+    res.setHeader('Access-Control-Allow-Methods', "POST, GET, OPTIONS, PUT, DELETE");
     var wishlist = []
 
     const userId = req.params.userId;
@@ -45,17 +48,23 @@ router.get('/wishlist/:userId', (req, res) => {
     }, function done(err) {
         if (err) { console.error(err); return; }
         res.setHeader('Access-Control-Allow-Origin', '*');
-        res.setHeader('Access-Control-Allow-Headers', '*');
-        res.setHeader('Access-Control-Allow-Methods', '*');
+        res.setHeader('Access-Control-Allow-Headers', "Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization, accept, origin, Cache-Control, X-Requested-With");
+        res.setHeader('Access-Control-Allow-Methods', "POST, GET, OPTIONS, PUT, DELETE");
 
         res.json(wishlist)
     });
 });
 
 router.post('/wishlist/:userId', (req, res) => {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Headers', "*");
+    res.setHeader('Access-Control-Allow-Credentials', "true");
+    res.setHeader('Access-Control-Allow-Methods', "POST, GET, OPTIONS, PUT, DELETE");
+    res.setHeader("Access-Control-Expose-Headers", "Content-Length,X-Csrf-Token");
+
     const userId = req.params.userId;
     const product = req.body.product
-    const productURL = req.body.product_url
+    const productURL = req.body.product_url;
 
     const createPayload = {
         user_id: userId,
@@ -93,6 +102,44 @@ router.post('/wishlist/:userId', (req, res) => {
             });
 
         });
+    });
+})
+
+router.put('/wishlist/:wishlistId/:userId', (req, res) => {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Headers', "Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization, accept, origin, Cache-Control, X-Requested-With");
+    res.setHeader('Access-Control-Allow-Methods', "POST, GET, OPTIONS, PUT, DELETE");
+    const userId = req.params.userId;
+    const wishlistId = req.params.wishlistId;
+
+    base('Wishlists').select({
+        filterByFormula: `id = "${wishlistId}"`,
+        view: "Grid view",
+        maxRecords: 1
+    }).firstPage((err, records) => {
+
+        if (err) {
+            console.error(err);
+            res.send({ success: false })
+            return;
+        }
+
+        if (records.length > 0) {
+            var record = records[0];
+            // Update fields here
+
+            base('Wishlists').update(record.getId(), {
+                user_id: userId,
+            }).then(record => {
+                res.json({ success: true })
+            }).catch(err => {
+                res.json({ success: false, error: err })
+            });
+
+        } else {
+            res.json({ success: false, error: 'No matching record found.' })
+        }
+
     });
 })
 // Export the router

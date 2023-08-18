@@ -7,6 +7,11 @@ var base = new Airtable({ apiKey: 'patuuwMwGmAjND2nB.283a8c42b2e50f0ec514e62b0f6
 
 
 router.post('/wishlist/checkout/:wishlistID', (req, res) => {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Headers', "*");
+    res.setHeader('Access-Control-Allow-Credentials', "true");
+    res.setHeader('Access-Control-Allow-Methods', "POST, GET, OPTIONS, PUT, DELETE");
+    res.setHeader("Access-Control-Expose-Headers", "Content-Length,X-Csrf-Token");
     // initiate checkout and send the url back
 
     const wishlistID = req.params.wishlistID;
