@@ -25,13 +25,13 @@ router.get('/wishlist/:userId', (req, res) => {
                 product_id: jsonData.id,
                 product_name: jsonData.title,
                 variant_id: jsonData.variants[0].id,
-                initial_price: 10000,
+                initial_price: parseInt(record.get('initial_price') * 100),
                 images: [
                     jsonData.images[0].src,
                 ],
                 product_url: record.get('product_url'),
                 vendor: jsonData.vendor,
-                current_price: jsonData.variants[0].price,
+                current_price: parseInt(jsonData.variants[0].price * 100),
                 is_in_stock: true,
             }
 
