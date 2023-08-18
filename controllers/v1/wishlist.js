@@ -82,7 +82,7 @@ router.post('/wishlist/:userId', (req, res) => {
             redirection_url = "https://checkout.stagingsimpl.com/wishlist/" + wishListId
 
             initiateCart(wishListId, productURL, product).then((response) => {
-                const redirection_url = response.data.redirection_url + "&addToWishlist=true"
+                const redirection_url = response.data.redirection_url + "&wishlist-id=" + wishListId
                 res.json({
                     success: true,
                     redirection_url: redirection_url
